@@ -18,7 +18,7 @@ def tokenize(doc):
 	return['/'.join(t) for t in t.pos(doc,norm=True,stem=True)]
 texts_ko = [tokenize(contents)
 			for contents in doc_ko['contents_all']]
-# tokens = [t for d in texts_ko for t in d]
+tokens = [t for d in texts_ko for t in d]
 
 # pdb.set_trace()
 def clean(doc, CleanTerm):
@@ -27,11 +27,23 @@ def clean(doc, CleanTerm):
 		Remove = [word for word in sentence \
 					if CleanTerm not in word]
 		words_clean.append(Remove)
+	return words_clean
 
 clean_josa, clean_punc = clean(texts_ko, 'Josa'), clean(clean_josa, 'Punctuation')
 clean_part = clean(clean_punc, 'KoreanParticle')
 texts_clean = clean_part
-tokens = [t for d in texts_clean for t in d]
+tokens_clean = [t for d in texts_clean for t in d]
+
+def popup(doc, PopupTerm):
+	words_pop = list()
+	for sentence in doc:
+		pops = [word for word in sentence \
+				if PopupTerm in word]
+		words_pop.append(pops)
+	return words_pop
+
+texts_noun = popup(texts_ko, 'Noun')
+tokens_noun = [t for d in texts_noun for t in d]
 
 """ 2. Data exploration (feat.NLTK) """
 
@@ -41,7 +53,9 @@ tokens_ko = t.morphs(doc_ko)
 """
 
 import nltk
-ko = nltk.Text(tokens,name='jawsD')
+# ko = nltk.Text(tokens,name='jawsD')
+# ko_clean = nltk.Text(tokens_clean,name='jawsD')
+ko_noun = nltk.Text(tokens_noun,name='jawsD')
 
 # Count Tokens
 print(len(ko.tokens))	# returns numbers of tokens
@@ -90,7 +104,7 @@ from gensim import corpora
 
 # Create Dictionary by using the tokenized texts
 Content = list()
-for TokenizedContent in texts_clean:
+for TokenizedContent in texts_noun:
 	word = [TokenizedWord.split('/')[0] \
 			for TokenizedWord in TokenizedContent]
 	Content.append(word)
