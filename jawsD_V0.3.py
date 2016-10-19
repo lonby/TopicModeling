@@ -88,23 +88,28 @@ from gensim import corpora
 # 	detoken.append(term)
 # 	z += 1
 
-
+# Create Dictionary by using the tokenized texts
+Content = list()
+for TokenizedContent in texts_clean:
+	word = [TokenizedWord.split('/')[0] \
+			for TokenizedWord in TokenizedContent]
+	Content.append(word)
 
 # dictionary_ko = corpora.Dictionary(texts_ko)
-dictionary_ko = corpora.Dictionary(detoken)
+dictionary_ko = corpora.Dictionary(Content)
 dictionary_ko.save('jawsD.dict')
 
 #calulate TF-IDF
 from gensim import models
 # tf_ko = [dictionary_ko.doc2bow(text) for text in texts_ko]
-tf_ko = [dictionary_ko.doc2bow(text) for text in detoken]
+tf_ko = [dictionary_ko.doc2bow(text) for text in Content]
 tfidf_model_ko = models.TfidfModel()
 tfidf_ko = tfidf_model_ko[tf_ko]
 # corpora.MmCorpus.serialize('jawsD.mm', tfidf_ko)
 
 # Topic model
 #LSI
-ntopics, nwords = 2, 30
+ntopics, nwords = 5, 30
 # lsi_ko = models.lsimodel.LsiModel(tfidf_ko, id2word=dictionary_ko, num_topics=ntopics)
 lsi_ko = models.lsimodel.LsiModel(tf_ko, id2word=dictionary_ko, num_topics=ntopics)
 print(lsi_ko.print_topics(num_topics=ntopics, num_words=nwords))
@@ -123,14 +128,13 @@ print(hdp_ko.print_topics(topics=ntopics, topn=nwords))
 
 #Scoring document
 # bow = tfidf_model_ko[dictionary_ko.doc2bow(detoken[0])]
-bow = [dictionary_ko.doc2bow(detoken[0])]
+bow = [dictionary_ko.doc2bow(Content[0])]
 sorted(lsi_ko[bow], key=lambda x: x[1], reverse=True)
 sorted(lda_ko[bow], key=lambda x: x[1], reverse=True)
 sorted(hdp_ko[bow], key=lambda x: x[1], reverse=True)
 
 # bow = tfidf_model_ko[dictionary_ko.doc2bow(detoken[1])]
-bow = [dictionary_ko.doc2bow(detoken[1])]
+bow = [dictionary_ko.doc2bow(Content[1])]
 sorted(lsi_ko[bow], key=lambda x: x[1], reverse=True)
 sorted(lda_ko[bow], key=lambda x: x[1], reverse=True)
 sorted(hdp_ko[bow], key=lambda x: x[1], reverse=True)
-
